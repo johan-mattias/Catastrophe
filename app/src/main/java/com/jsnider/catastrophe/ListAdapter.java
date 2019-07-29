@@ -15,15 +15,20 @@ public class ListAdapter extends
         RecyclerView.Adapter<ListAdapter.ViewHolder>  {
 
     private final LinkedList<String> mWordList;
+    private final LinkedList<String> urlList;
     private LayoutInflater mInflater;
 
     public static final String ID =
             "com.jsnider.catastrophe.ID";
+    public static final String URL =
+            "com.jsnider.catastrophe.URL";
 
     public ListAdapter(Context context,
-                           LinkedList<String> wordList) {
+                           LinkedList<String> wordList,
+                       LinkedList<String> urlList) {
         mInflater = LayoutInflater.from(context);
         this.mWordList = wordList;
+        this.urlList = urlList;
     }
 
     @Override
@@ -63,6 +68,8 @@ public class ListAdapter extends
 
             int mPosition = getLayoutPosition();
             String element = mWordList.get(mPosition);
+            String url = urlList.get(mPosition);
+
             TextView listItem = (TextView) view.findViewById(R.id.itemTextView);
             String id = listItem.getText().toString();
             mWordList.set(mPosition, "Clicked! " + element);
@@ -70,6 +77,7 @@ public class ListAdapter extends
             //add start second activity
             Intent intent = new Intent(view.getContext(), ViewActivity.class);
             intent.putExtra(ID, id);
+            intent.putExtra(URL, url);
 
             view.getContext().startActivity(intent);
 

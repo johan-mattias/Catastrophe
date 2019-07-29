@@ -23,15 +23,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.util.LinkedList;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView resultTextView;
     private EditText searchEditText;
     private final LinkedList<String> mWordList = new LinkedList<>();
+    private final LinkedList<String> urlList = new LinkedList<>();
     private RecyclerView mRecyclerView;
     private ListAdapter mAdapter;
 
@@ -54,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
         String url ="https://www.flickr.com/services/rest/?" +
                 "method=flickr.photos.search&" +
                 "api_key=3e0b862c934cf2ae6c6e8f55268e44c5&" +
-                "tags=cats," + query + "&" +
-                "tag_mode=all&" +
+                "tags=goat,goats," + query + "&" +
                 "format=json&" +
                 "nojsoncallback=1";
 
@@ -75,16 +73,28 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("error", e.toString());
                         }
 
-                        resultTextView.setText("url" + "        Response is: "+ photoArray.toString().substring(0,500));
+//                        resultTextView.setText("url" + "Response is: "+ photoArray.toString().substring(0,500));
 
+                        String item = null;
+                        String url = null;
                         for (int i = 0; i < 20; i++) {
-                            String item = null;
                             try {
                                 item = photoArray.getJSONObject(i+1).getString("id");
+                                url = "https://farm" +
+                                        photoArray.getJSONObject(i+1).getString("farm") +
+                                        ".staticflickr.com/" +
+                                        photoArray.getJSONObject(i+1).getString("server") +
+                                        "/"+
+                                        photoArray.getJSONObject(i+1).getString("id") +
+                                        "_"+
+                                        photoArray.getJSONObject(i+1).getString("secret") +
+                                        "_b.jpg";
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                             mWordList.addLast(item);
+                            urlList.addLast(url);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -98,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsonObjectRequest);
 
         mRecyclerView = findViewById(R.id.recyclerview);
-        mAdapter = new ListAdapter(this, mWordList);
+        mAdapter = new ListAdapter(this, mWordList, urlList);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
