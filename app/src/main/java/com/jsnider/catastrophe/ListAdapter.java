@@ -1,6 +1,7 @@
 package com.jsnider.catastrophe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +16,9 @@ public class ListAdapter extends
 
     private final LinkedList<String> mWordList;
     private LayoutInflater mInflater;
+
+    public static final String ID =
+            "com.jsnider.catastrophe.ID";
 
     public ListAdapter(Context context,
                            LinkedList<String> wordList) {
@@ -41,7 +45,8 @@ public class ListAdapter extends
         return mWordList.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder
+                                implements View.OnClickListener {
 
         public final TextView wordItemView;
         final ListAdapter mAdapter;
@@ -50,6 +55,26 @@ public class ListAdapter extends
             super(itemView);
             wordItemView = itemView.findViewById(R.id.itemTextView);
             this.mAdapter = adapter;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            int mPosition = getLayoutPosition();
+            String element = mWordList.get(mPosition);
+            TextView listItem = (TextView) view.findViewById(R.id.itemTextView);
+            String id = listItem.getText().toString();
+            mWordList.set(mPosition, "Clicked! " + element);
+
+            //add start second activity
+            Intent intent = new Intent(view.getContext(), ViewActivity.class);
+            intent.putExtra(ID, id);
+
+            view.getContext().startActivity(intent);
+
+            mAdapter.notifyDataSetChanged();
+
         }
     }
 }
