@@ -3,4 +3,6 @@
     <string name="napping">Be right there</string>
     <string name="favCat">happy</string>
     <string name="listItem">default text</string>
+    <string name="search">Search</string>
+    <string name="what_s_your_favorite_goat">What\'s your favorite goat</string>
 </resources>
