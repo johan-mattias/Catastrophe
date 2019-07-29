@@ -2,4 +2,5 @@
     <string name="app_name">Catastrophe</string>
     <string name="napping">Be right there</string>
     <string name="favCat">happy</string>
+    <string name="listItem">default text</string>
 </resources>

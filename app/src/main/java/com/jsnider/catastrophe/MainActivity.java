@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultTextView;
     private EditText searchEditText;
     private final LinkedList<String> mWordList = new LinkedList<>();
+    private RecyclerView mRecyclerView;
+    private ListAdapter mAdapter;
 
     RequestQueue queue;
 
@@ -39,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         resultTextView = findViewById(R.id.resultTextView);
         searchEditText = findViewById(R.id.searchEditText);
-
-
         queue = Volley.newRequestQueue(this);
+
     }
 
     public void search(View view) {
@@ -93,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         queue.add(jsonObjectRequest);
+
+        mRecyclerView = findViewById(R.id.recyclerview);
+        mAdapter = new ListAdapter(this, mWordList);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
