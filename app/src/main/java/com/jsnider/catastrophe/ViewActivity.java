@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,10 +25,10 @@ public class ViewActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        String id = intent.getStringExtra(ListAdapter.ID);
+        //String id = intent.getStringExtra(ListAdapter.ID);
         String url = intent.getStringExtra(ListAdapter.URL);
-        TextView textView = findViewById(R.id.idTextView);
-        textView.setText(id);
+        //TextView textView = findViewById(R.id.idTextView);
+        //textView.setText(id);
 
         final ImageView mImageView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
@@ -41,7 +42,7 @@ public class ViewActivity extends AppCompatActivity {
                 }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.e(getString(R.string.load_error), error.toString());
                     }
                 });
         queue.add(request);

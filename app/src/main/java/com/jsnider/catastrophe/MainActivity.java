@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void search(View view) {
         mRecyclerView = findViewById(R.id.recyclerview);
-        mRecyclerView.removeAllViewsInLayout();
 
         String query = searchEditText.getText().toString();
 
@@ -101,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
 
-        view.clearFocus();
     }
 
 }
