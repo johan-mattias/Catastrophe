@@ -2,12 +2,21 @@ package com.jsnider.catastrophe;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.util.LinkedList;
 
@@ -17,6 +26,7 @@ public class ListAdapter extends
     private final LinkedList<String> mWordList;
     private final LinkedList<String> urlList;
     private LayoutInflater mInflater;
+    RequestQueue queue;
 
     public static final String ID =
             "com.jsnider.catastrophe.ID";
@@ -40,9 +50,30 @@ public class ListAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         String mCurrent = mWordList.get(position);
-        holder.wordItemView.setText(mCurrent);
+        holder.itemImageView.getContext();
+
+        //final ImageView mImageView = itemView.findViewById(R.id.itemImageView);
+        queue = Volley.newRequestQueue(holder.itemImageView.getContext());
+
+        String itemUrl = urlList.get(position);
+
+        ImageRequest request = new ImageRequest(itemUrl,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        //mImageView.setImageBitmap(bitmap);
+                        holder.itemImageView.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Loading thumbnail", error.toString());
+                    }
+                });
+        queue.add(request);
+
     }
 
     @Override
@@ -53,12 +84,16 @@ public class ListAdapter extends
     class ViewHolder extends RecyclerView.ViewHolder
                                 implements View.OnClickListener {
 
-        public final TextView wordItemView;
+
+        //public final TextView wordItemView;
+        public final ImageView itemImageView;
         final ListAdapter mAdapter;
 
         public ViewHolder(View itemView, ListAdapter adapter) {
             super(itemView);
-            wordItemView = itemView.findViewById(R.id.itemTextView);
+            //wordItemView = itemView.findViewById(R.id.itemTextView);
+            itemImageView = itemView.findViewById(R.id.itemImageView);
+
             this.mAdapter = adapter;
             itemView.setOnClickListener(this);
         }
@@ -70,13 +105,13 @@ public class ListAdapter extends
             String element = mWordList.get(mPosition);
             String url = urlList.get(mPosition);
 
-            TextView listItem = (TextView) view.findViewById(R.id.itemTextView);
-            String id = listItem.getText().toString();
-            mWordList.set(mPosition, "Clicked! " + element);
+            //TextView listItem = (TextView) view.findViewById(R.id.itemTextView);
+            //String id = listItem.getText().toString();
+            //mWordList.set(mPosition, "Clicked! " + element);
 
             //add start second activity
             Intent intent = new Intent(view.getContext(), ViewActivity.class);
-            intent.putExtra(ID, id);
+            //intent.putExtra(ID, id);
             intent.putExtra(URL, url);
 
             view.getContext().startActivity(intent);

@@ -5,4 +5,5 @@
     <string name="listItem">default text</string>
     <string name="search">Search</string>
     <string name="what_s_your_favorite_goat">What\'s your favorite goat</string>
+    <string name="load_error">Loading main pictures</string>
 </resources>

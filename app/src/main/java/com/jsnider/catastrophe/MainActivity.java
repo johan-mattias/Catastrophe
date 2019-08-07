@@ -1,5 +1,6 @@
 package com.jsnider.catastrophe;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -7,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -38,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(this);
     }
 
-    public void search(View view) {
+    public void search(final View view) {
         mRecyclerView = findViewById(R.id.recyclerview);
-        mRecyclerView.removeAllViewsInLayout();
 
-        String query = searchEditText.getText().toString();
+        mWordList.clear();
+        urlList.clear();
+
+        final String query = searchEditText.getText().toString();
 
         String url ="https://www.flickr.com/services/rest/?" +
                 "method=flickr.photos.search&" +
@@ -59,15 +63,34 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         JSONArray photoArray = null;
+                        int total = 0;
+                        int max = 21;
                         try {
-                            photoArray = response.getJSONObject("photos").getJSONArray("photo");
+                            total = response.getJSONObject("photos").getInt("total");
+                            if(total > 0) {
+                                photoArray = response.getJSONObject("photos").getJSONArray("photo");
+                            } else {
+                                Context context = getApplicationContext();
+                                CharSequence text = "Sad: there are no: " +
+                                                    query +
+                                                    " goats";
+                                int duration = Toast.LENGTH_LONG;
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                                return;
+                            }
                         } catch (JSONException e) {
                             Log.e("error", e.toString());
                         }
 
                         String item = null;
                         String url = null;
-                        for (int i = 0; i < 20; i++) {
+
+                        if(total < max) {
+                            max = total - (total % 3);
+                        }
+
+                        for (int i = 0; i < max; i++) {
                             try {
                                 item = photoArray.getJSONObject(i+1).getString("id");
                                 url = "https://farm" +
@@ -83,9 +106,16 @@ public class MainActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            mWordList.addLast(item);
-                            urlList.addLast(url);
+
+                            if(item!=null && url!=null) {
+                                mWordList.addLast(item);
+                                urlList.addLast(url);
+                            }
                         }
+
+                        mAdapter = new ListAdapter(view.getContext(), mWordList, urlList);
+                        mRecyclerView.setAdapter(mAdapter);
+                        mRecyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 3));
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -97,11 +127,10 @@ public class MainActivity extends AppCompatActivity {
         // Add the request to the RequestQueue.
         queue.add(jsonObjectRequest);
 
-        mAdapter = new ListAdapter(this, mWordList, urlList);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+//        mAdapter = new ListAdapter(this, mWordList, urlList);
+//        mRecyclerView.setAdapter(mAdapter);
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
 
-        view.clearFocus();
     }
 
 }
