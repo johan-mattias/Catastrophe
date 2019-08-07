@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void search(final View view) {
         mRecyclerView = findViewById(R.id.recyclerview);
+
+        //from: https://stackoverflow.com/questions/13593069/androidhide-keyboard-after-button-click/13593232
+        try {
+            InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception e) {
+            Log.e("error", e.toString());
+        }
 
         mWordList.clear();
         urlList.clear();
