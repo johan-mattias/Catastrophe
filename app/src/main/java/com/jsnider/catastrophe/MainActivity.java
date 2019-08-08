@@ -1,6 +1,7 @@
 package com.jsnider.catastrophe;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,13 +23,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText searchEditText;
-    private final LinkedList<String> mWordList = new LinkedList<>();
-    private final LinkedList<String> urlList = new LinkedList<>();
+    private ArrayList<String> mWordList = new ArrayList<>();
+    private ArrayList<String> urlList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private ListAdapter mAdapter;
     RequestQueue queue;
@@ -38,19 +40,59 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         searchEditText = findViewById(R.id.searchEditText);
+        mRecyclerView = findViewById(R.id.recyclerview);
         queue = Volley.newRequestQueue(this);
+
+        // Restore the state.
+        if (savedInstanceState != null) {
+            mWordList = savedInstanceState.getStringArrayList("mWordList");
+            urlList = savedInstanceState.getStringArrayList("urlList");
+
+            if(mWordList != null && mWordList != null) {
+                populateRecyclerView();
+                hideKeyboard(mRecyclerView);
+            }
+        }
     }
 
-    public void search(final View view) {
-        mRecyclerView = findViewById(R.id.recyclerview);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        if (mWordList != null && mWordList != null) {
+            outState.putStringArrayList("mWordList", mWordList);
+            outState.putStringArrayList("urlList", urlList);
+        }
+
+    }
+
+    public void hideKeyboard(View view) {
         //from: https://stackoverflow.com/questions/13593069/androidhide-keyboard-after-button-click/13593232
         try {
             InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         } catch (Exception e) {
             Log.e("error", e.toString());
         }
+    }
+
+    public void populateRecyclerView() {
+        int spanCount;
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            spanCount = 6;
+        } else {
+            spanCount = 3;
+        }
+
+        mAdapter = new ListAdapter(this, mWordList, urlList);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
+    }
+
+    public void search(final View view) {
+
+        hideKeyboard(view);
 
         mWordList.clear();
         urlList.clear();
@@ -117,14 +159,12 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             if(item!=null && url!=null) {
-                                mWordList.addLast(item);
-                                urlList.addLast(url);
+                                mWordList.add(item);
+                                urlList.add(url);
                             }
                         }
 
-                        mAdapter = new ListAdapter(view.getContext(), mWordList, urlList);
-                        mRecyclerView.setAdapter(mAdapter);
-                        mRecyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), 3));
+                        populateRecyclerView();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -135,10 +175,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         queue.add(jsonObjectRequest);
-
-//        mAdapter = new ListAdapter(this, mWordList, urlList);
-//        mRecyclerView.setAdapter(mAdapter);
-//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
 
     }
 

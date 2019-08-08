@@ -18,13 +18,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class ListAdapter extends
         RecyclerView.Adapter<ListAdapter.ViewHolder>  {
 
-    private final LinkedList<String> mWordList;
-    private final LinkedList<String> urlList;
+    private final ArrayList<String> mWordList;
+    private final ArrayList<String> urlList;
     private LayoutInflater mInflater;
     RequestQueue queue;
 
@@ -34,8 +34,8 @@ public class ListAdapter extends
             "com.jsnider.catastrophe.URL";
 
     public ListAdapter(Context context,
-                           LinkedList<String> wordList,
-                       LinkedList<String> urlList) {
+                       ArrayList<String> wordList,
+                       ArrayList<String> urlList) {
         mInflater = LayoutInflater.from(context);
         this.mWordList = wordList;
         this.urlList = urlList;
