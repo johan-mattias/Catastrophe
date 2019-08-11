@@ -2,9 +2,15 @@ package com.jsnider.catastrophe;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +23,7 @@ import com.android.volley.toolbox.Volley;
 public class ViewActivity extends AppCompatActivity {
 
     RequestQueue queue;
+    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +33,7 @@ public class ViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         //String id = intent.getStringExtra(ListAdapter.ID);
-        String url = intent.getStringExtra(ListAdapter.URL);
+        url = intent.getStringExtra(ListAdapter.URL);
         //TextView textView = findViewById(R.id.idTextView);
         //textView.setText(id);
 
@@ -46,6 +53,25 @@ public class ViewActivity extends AppCompatActivity {
                     }
                 });
         queue.add(request);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+
+    public void share(MenuItem item) {
+        String mimeType = "text/plain";
+        ShareCompat.IntentBuilder
+                .from(this)
+                .setType(mimeType)
+                .setChooserTitle(R.string.share_text_with)
+                .setText(url)
+                .startChooser();
 
     }
 }
