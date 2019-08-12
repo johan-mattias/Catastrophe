@@ -2,6 +2,7 @@ package com.jsnider.catastrophe;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import com.android.volley.toolbox.Volley;
 public class ViewActivity extends AppCompatActivity {
 
     RequestQueue queue;
-    String url;
+    String uri_string;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +33,17 @@ public class ViewActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        //String id = intent.getStringExtra(ListAdapter.ID);
-        url = intent.getStringExtra(ListAdapter.URL);
-        //TextView textView = findViewById(R.id.idTextView);
-        //textView.setText(id);
+        Uri uri = intent.getData();
+        if (uri != null) {
+            uri_string =  uri.toString();
+        } else {
+            uri_string = intent.getStringExtra(ListAdapter.URL);
+        }
 
         final ImageView mImageView = findViewById(R.id.imageView);
         queue = Volley.newRequestQueue(this);
 
-        ImageRequest request = new ImageRequest(url,
+        ImageRequest request = new ImageRequest(uri_string,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
@@ -52,7 +55,9 @@ public class ViewActivity extends AppCompatActivity {
                         Log.e(getString(R.string.load_error), error.toString());
                     }
                 });
-        queue.add(request);
+        if(uri_string != null) {
+            queue.add(request);
+        }
 
     }
 
@@ -63,14 +68,13 @@ public class ViewActivity extends AppCompatActivity {
         return true;
     }
 
-
     public void share(MenuItem item) {
         String mimeType = "text/plain";
         ShareCompat.IntentBuilder
                 .from(this)
                 .setType(mimeType)
                 .setChooserTitle(R.string.share_text_with)
-                .setText(url)
+                .setText(uri_string)
                 .startChooser();
 
     }
